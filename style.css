@@ -88,8 +88,11 @@ img { max-width: 100%; }
 }
 nav.main-nav {
   display: flex;
-  gap: 22px;
-  font-size: 0.94rem;
+  flex-wrap: wrap;
+  row-gap: 6px;
+  gap: 18px;
+  font-size: 0.9rem;
+  justify-content: flex-end;
 }
 nav.main-nav a { color: var(--ink); }
 nav.main-nav a:hover { color: var(--signal-soft); }
@@ -325,6 +328,20 @@ button.secondary:hover {
   font-family: var(--mono);
   font-size: 0.9em;
 }
+
+.notice {
+  border-left: 3px solid var(--signal);
+  background: var(--paper-dim);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  border-radius: var(--radius);
+  margin-top: 14px;
+}
+input[type=file] { color: var(--ink); font-size: 0.92rem; }
+.file-list { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-soft); margin-top: 8px; }
+.progress-wrap { height: 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-top: 12px; }
+.progress-bar { height: 100%; width: 0%; background: var(--signal); box-shadow: var(--glow); transition: width .2s ease; }
 
 /* ===== Ad slot placeholders ===== */
 .ad-slot {

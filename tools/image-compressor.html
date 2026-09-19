@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Compressor — Reduce Photo File Size Online | ToolKrate</title>
+<meta name="description" content="Compress JPG, PNG or WebP images to a smaller file size by adjusting quality, entirely in your browser. Free, no upload to any server.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="mark"></span>ToolKrate<span class="tag">free tools</span></a>
+    <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    <nav class="main-nav">
+      <a href="../index.html">Home</a>
+      <a href="../tools/word-counter.html">Word Counter</a>
+      <a href="../tools/case-converter.html">Case Converter</a>
+      <a href="../tools/password-generator.html">Password Generator</a>
+      <a href="../tools/qr-code-generator.html">QR Code</a>
+      <a href="../tools/bmi-calculator.html">BMI Calculator</a>
+      <a href="../tools/age-calculator.html">Age Calculator</a>
+      <a href="../tools/percentage-calculator.html">Percentage</a>
+      <a href="../tools/unit-converter.html">Unit Converter</a>
+      <a href="../tools/color-converter.html">Color Converter</a>
+      <a href="../tools/json-formatter.html">JSON Formatter</a>
+      <a href="../tools/base64.html">Base64</a>
+      <a href="../tools/zakat-calculator.html">Zakat Calculator</a>
+      <a href="../tools/loan-calculator.html">Loan / EMI</a>
+      <a href="../tools/image-compressor.html" aria-current="page">Image Compressor</a>
+      <a href="../tools/image-resizer.html">Image Resizer</a>
+      <a href="../tools/image-converter.html">Image Converter</a>
+      <a href="../tools/images-to-pdf.html">Images to PDF</a>
+      <a href="../tools/merge-pdf.html">Merge PDF</a>
+      <a href="../tools/word-to-pdf.html">Word to PDF</a>
+      <a href="../tools/zip-files.html">Zip Files</a>
+      <a href="../about.html">About</a>
+      <a href="../contact.html">Contact</a>
+      <a href="../privacy-policy.html">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+
+<section class="wrap">
+  <p class="crumb"><a href="../index.html">Home</a> / Image Compressor</p>
+</section>
+<section class="page-head wrap">
+  <h1>Image Compressor</h1>
+  <p>Reduce a JPG or PNG's file size by adjusting quality, right in your browser. Pick a photo, drag the slider, download the smaller version.</p>
+</section>
+
+<section class="wrap">
+  <div class="workspace">
+    <div class="field">
+      <label for="file">Choose an image</label>
+      <input type="file" id="file" accept="image/png, image/jpeg, image/webp">
+    </div>
+    <div class="field">
+      <label for="quality">Quality: <span id="qLabel">70</span>%</label>
+      <input type="range" id="quality" min="10" max="100" value="70" style="width:100%;">
+      <p class="hint">Lower quality = smaller file. 60&ndash;80% is usually a good balance for photos.</p>
+    </div>
+    <div class="field">
+      <label for="maxWidth">Max width (px, optional)</label>
+      <input type="number" id="maxWidth" placeholder="e.g. 1600 &mdash; leave blank to keep original size">
+    </div>
+    <button onclick="process()">Compress image</button>
+
+    <div id="result" style="display:none; margin-top:20px;">
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="originalSize">0 KB</div><div class="l">Original size</div></div>
+        <div class="stat"><div class="n" id="newSize">0 KB</div><div class="l">Compressed size</div></div>
+        <div class="stat"><div class="n" id="saved">0%</div><div class="l">Reduction</div></div>
+      </div>
+      <div style="text-align:center; margin-top:16px;">
+        <img id="preview" style="max-width:100%; border:1px solid var(--line); border-radius:3px;">
+        <div style="margin-top:12px;">
+          <a class="btn" id="downloadBtn" download="compressed.jpg">Download compressed image</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot">Ad space</div></div>
+
+<section class="wrap prose">
+  <h2>How this works</h2>
+  <p>The image is decoded and redrawn onto a canvas element in your browser, then re-encoded at the quality level you choose. PNGs with transparency are converted to JPEG during compression (JPEG has no transparency); to keep transparency, choose a lower max-width instead of relying on quality, or use the Image Converter tool to export as WebP, which supports both transparency and stronger compression.</p>
+</section>
+
+<script>
+const qSlider = document.getElementById('quality');
+document.getElementById('qLabel').textContent = qSlider.value;
+qSlider.addEventListener('input', () => document.getElementById('qLabel').textContent = qSlider.value);
+
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  return (n/1024/1024).toFixed(2) + ' MB';
+}
+
+function process() {
+  const fileInput = document.getElementById('file');
+  const file = fileInput.files[0];
+  if (!file) { alert('Choose an image first.'); return; }
+  const quality = parseInt(qSlider.value) / 100;
+  const maxWidth = parseFloat(document.getElementById('maxWidth').value) || null;
+
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    img.onload = function () {
+      let w = img.width, h = img.height;
+      if (maxWidth && w > maxWidth) {
+        h = Math.round(h * (maxWidth / w));
+        w = maxWidth;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(function (blob) {
+        const url = URL.createObjectURL(blob);
+        document.getElementById('preview').src = url;
+        document.getElementById('downloadBtn').href = url;
+        document.getElementById('originalSize').textContent = fmtBytes(file.size);
+        document.getElementById('newSize').textContent = fmtBytes(blob.size);
+        const saved = Math.max(0, Math.round((1 - blob.size / file.size) * 100));
+        document.getElementById('saved').textContent = saved + '%';
+        document.getElementById('result').style.display = 'block';
+      }, 'image/jpeg', quality);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="../tools/word-counter.html">Word Counter</a></li><li><a href="../tools/case-converter.html">Case Converter</a></li><li><a href="../tools/password-generator.html">Password Generator</a></li><li><a href="../tools/qr-code-generator.html">QR Code</a></li><li><a href="../tools/bmi-calculator.html">BMI Calculator</a></li><li><a href="../tools/age-calculator.html">Age Calculator</a></li><li><a href="../tools/percentage-calculator.html">Percentage</a></li><li><a href="../tools/unit-converter.html">Unit Converter</a></li><li><a href="../tools/color-converter.html">Color Converter</a></li><li><a href="../tools/json-formatter.html">JSON Formatter</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More tools</h4>
+        <ul>
+          <li><a href="../tools/base64.html">Base64</a></li><li><a href="../tools/zakat-calculator.html">Zakat Calculator</a></li><li><a href="../tools/loan-calculator.html">Loan / EMI</a></li><li><a href="../tools/image-compressor.html">Image Compressor</a></li><li><a href="../tools/image-resizer.html">Image Resizer</a></li><li><a href="../tools/image-converter.html">Image Converter</a></li><li><a href="../tools/images-to-pdf.html">Images to PDF</a></li><li><a href="../tools/merge-pdf.html">Merge PDF</a></li><li><a href="../tools/word-to-pdf.html">Word to PDF</a></li><li><a href="../tools/zip-files.html">Zip Files</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="../about.html">About</a></li>
+          <li><a href="../contact.html">Contact</a></li>
+          <li><a href="../privacy-policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="foot-note">ToolKrate &mdash; free browser-based tools. All processing happens on your device; nothing you type or upload is sent to a server.</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</body>
+</html>
