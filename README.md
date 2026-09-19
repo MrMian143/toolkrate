@@ -1,6 +1,6 @@
 # ToolKrate — Free Utility Tools Website
 
-Static site, 13 real client-side tools + About/Contact/Privacy pages. No backend, no build step — pure HTML/CSS/JS. Everything runs in the visitor's browser.
+Static site, 13 real client-side tools + About/Contact/Privacy pages. No backend, no build step — pure HTML/CSS/JS. Black-and-red theme with glowing buttons and cards. Everything runs in the visitor's browser.
 
 ## Tools included
 Word & Character Counter, Case Converter, Password Generator, QR Code Generator, BMI Calculator, Age Calculator, Percentage Calculator, Unit Converter, Color Converter, JSON Formatter, Base64 Encode/Decode, Zakat Calculator, Loan/EMI Calculator.
@@ -15,7 +15,7 @@ Word & Character Counter, Case Converter, Password Generator, QR Code Generator,
 
 ## Before you apply for AdSense
 
-- Edit `contact.html` and replace the placeholder email with your real one.
+- Contact page is already set to zaidsarwar1403@gmail.com — no need to edit it.
 - Edit `privacy-policy.html` if you add Google Analytics or any other service — mention it there.
 - Consider connecting a custom domain in Vercel (Settings → Domains) — a real domain (not just `.vercel.app`) generally approves faster and looks more trustworthy to AdSense reviewers.
 - Let the site sit live for a little while with real visits before applying — a brand new, empty-feeling site is more likely to get a "low value content" rejection even when every page is genuine.
@@ -25,3 +25,4 @@ Word & Character Counter, Case Converter, Password Generator, QR Code Generator,
 - All 13 tools do real calculations/conversions in JavaScript — nothing is a stub or a fake result.
 - The QR generator calls a free public API (`api.qrserver.com`) to render the image, since generating a QR code from scratch needs a proper QR algorithm; everything else is 100% self-contained JS.
 - No localStorage/cookies are used by the tools themselves — only what an ad network you add will use.
+- Colors, glow and every visual style live in `style.css` under `:root` — change the `--signal` (red), `--paper` (background) and `--ink` (text) variables there if you want to retint the whole site later.
