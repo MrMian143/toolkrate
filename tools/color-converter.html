@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Converter — HEX, RGB, HSL | ToolKrate</title>
+<meta name="description" content="Pick a color or enter a HEX code to instantly see its RGB and HSL values, with a live preview swatch.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="mark"></span>ToolKrate<span class="tag">free tools</span></a>
+    <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    <nav class="main-nav">
+      <a href="../index.html">Home</a>
+      <a href="../tools/word-counter.html">Word Counter</a>
+      <a href="../tools/case-converter.html">Case Converter</a>
+      <a href="../tools/password-generator.html">Password Generator</a>
+      <a href="../tools/qr-code-generator.html">QR Code</a>
+      <a href="../tools/bmi-calculator.html">BMI Calculator</a>
+      <a href="../tools/age-calculator.html">Age Calculator</a>
+      <a href="../tools/percentage-calculator.html">Percentage</a>
+      <a href="../tools/unit-converter.html">Unit Converter</a>
+      <a href="../tools/color-converter.html" aria-current="page">Color Converter</a>
+      <a href="../tools/json-formatter.html">JSON Formatter</a>
+      <a href="../tools/base64.html">Base64</a>
+      <a href="../tools/zakat-calculator.html">Zakat Calculator</a>
+      <a href="../tools/loan-calculator.html">Loan / EMI</a>
+      <a href="../about.html">About</a>
+      <a href="../contact.html">Contact</a>
+      <a href="../privacy-policy.html">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+
+<section class="wrap">
+  <p class="crumb"><a href="../index.html">Home</a> / Color Converter</p>
+</section>
+<section class="page-head wrap">
+  <h1>Color Converter</h1>
+  <p>Pick a color or type a HEX value to get RGB and HSL equivalents.</p>
+</section>
+
+<section class="wrap">
+  <div class="workspace">
+    <div class="row">
+      <div class="field">
+        <label for="picker">Pick a color</label>
+        <input type="color" id="picker" value="#2C6E6E" style="height:44px; padding:4px;">
+      </div>
+      <div class="field">
+        <label for="hexInput">Or type HEX</label>
+        <input type="text" id="hexInput" placeholder="#2C6E6E">
+      </div>
+    </div>
+    <div id="swatch" style="height:80px; border:1.5px solid var(--ink); border-radius:3px; margin:16px 0;"></div>
+    <div class="stat-row">
+      <div class="stat"><div class="n" id="hexOut">#2C6E6E</div><div class="l">HEX</div></div>
+      <div class="stat"><div class="n" id="rgbOut">rgb(44,110,110)</div><div class="l">RGB</div></div>
+      <div class="stat"><div class="n" id="hslOut">hsl(180,43%,30%)</div><div class="l">HSL</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot">Ad space</div></div>
+
+<script>
+const picker = document.getElementById('picker');
+const hexInput = document.getElementById('hexInput');
+const swatch = document.getElementById('swatch');
+
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const num = parseInt(hex, 16);
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+function render(hex) {
+  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+    if (/^#[0-9A-Fa-f]{3}$/.test(hex)) {
+      hex = '#' + hex.slice(1).split('').map(c => c + c).join('');
+    } else { return; }
+  }
+  const { r, g, b } = hexToRgb(hex);
+  const { h, s, l } = rgbToHsl(r, g, b);
+  swatch.style.background = hex;
+  document.getElementById('hexOut').textContent = hex.toUpperCase();
+  document.getElementById('rgbOut').textContent = 'rgb(' + r + ',' + g + ',' + b + ')';
+  document.getElementById('hslOut').textContent = 'hsl(' + h + ',' + s + '%,' + l + '%)';
+  picker.value = hex;
+  hexInput.value = hex;
+}
+picker.addEventListener('input', () => render(picker.value));
+hexInput.addEventListener('input', () => render(hexInput.value.trim()));
+render('#2C6E6E');
+</script>
+
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="../tools/word-counter.html">Word Counter</a></li><li><a href="../tools/case-converter.html">Case Converter</a></li><li><a href="../tools/password-generator.html">Password Generator</a></li><li><a href="../tools/qr-code-generator.html">QR Code</a></li><li><a href="../tools/bmi-calculator.html">BMI Calculator</a></li><li><a href="../tools/age-calculator.html">Age Calculator</a></li><li><a href="../tools/percentage-calculator.html">Percentage</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More tools</h4>
+        <ul>
+          <li><a href="../tools/unit-converter.html">Unit Converter</a></li><li><a href="../tools/color-converter.html">Color Converter</a></li><li><a href="../tools/json-formatter.html">JSON Formatter</a></li><li><a href="../tools/base64.html">Base64</a></li><li><a href="../tools/zakat-calculator.html">Zakat Calculator</a></li><li><a href="../tools/loan-calculator.html">Loan / EMI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="../about.html">About</a></li>
+          <li><a href="../contact.html">Contact</a></li>
+          <li><a href="../privacy-policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="foot-note">ToolKrate &mdash; free browser-based tools. All processing happens on your device; nothing you type or upload is sent to a server.</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</body>
+</html>

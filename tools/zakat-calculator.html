@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zakat Calculator — Gold, Silver, Cash & Savings | ToolKrate</title>
+<meta name="description" content="Calculate your annual Zakat from gold, silver, cash, savings and investments, with the nisab threshold applied automatically.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="mark"></span>ToolKrate<span class="tag">free tools</span></a>
+    <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    <nav class="main-nav">
+      <a href="../index.html">Home</a>
+      <a href="../tools/word-counter.html">Word Counter</a>
+      <a href="../tools/case-converter.html">Case Converter</a>
+      <a href="../tools/password-generator.html">Password Generator</a>
+      <a href="../tools/qr-code-generator.html">QR Code</a>
+      <a href="../tools/bmi-calculator.html">BMI Calculator</a>
+      <a href="../tools/age-calculator.html">Age Calculator</a>
+      <a href="../tools/percentage-calculator.html">Percentage</a>
+      <a href="../tools/unit-converter.html">Unit Converter</a>
+      <a href="../tools/color-converter.html">Color Converter</a>
+      <a href="../tools/json-formatter.html">JSON Formatter</a>
+      <a href="../tools/base64.html">Base64</a>
+      <a href="../tools/zakat-calculator.html" aria-current="page">Zakat Calculator</a>
+      <a href="../tools/loan-calculator.html">Loan / EMI</a>
+      <a href="../about.html">About</a>
+      <a href="../contact.html">Contact</a>
+      <a href="../privacy-policy.html">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+
+<section class="wrap">
+  <p class="crumb"><a href="../index.html">Home</a> / Zakat Calculator</p>
+</section>
+<section class="page-head wrap">
+  <h1>Zakat Calculator</h1>
+  <p>Add up your zakat-eligible assets and this works out 2.5% due, and whether you've reached nisab.</p>
+</section>
+
+<section class="wrap">
+  <div class="workspace">
+    <div class="field">
+      <label for="gold">Gold you own (grams)</label>
+      <input type="number" id="gold" placeholder="0">
+    </div>
+    <div class="field">
+      <label for="goldRate">Current gold price per gram (your currency)</label>
+      <input type="number" id="goldRate" placeholder="e.g. 22000">
+      <p class="hint">Use today's local gold rate &mdash; prices move daily, so this isn't pre-filled.</p>
+    </div>
+    <div class="field">
+      <label for="silver">Silver you own (grams)</label>
+      <input type="number" id="silver" placeholder="0">
+    </div>
+    <div class="field">
+      <label for="silverRate">Current silver price per gram</label>
+      <input type="number" id="silverRate" placeholder="e.g. 260">
+    </div>
+    <div class="field">
+      <label for="cash">Cash, bank balance &amp; savings</label>
+      <input type="number" id="cash" placeholder="0">
+    </div>
+    <div class="field">
+      <label for="invest">Investments, business stock &amp; receivables owed to you</label>
+      <input type="number" id="invest" placeholder="0">
+    </div>
+    <div class="field">
+      <label for="debt">Debts / liabilities due for payment</label>
+      <input type="number" id="debt" placeholder="0">
+    </div>
+    <button onclick="calc()">Calculate Zakat</button>
+    <div class="output" id="out" style="display:none;"></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot">Ad space</div></div>
+
+<section class="wrap prose">
+  <h2>How this is worked out</h2>
+  <p>Nisab is commonly set at the value of 87.48g of gold or 612.36g of silver &mdash; whichever is lower, using the silver standard, is the more cautious and widely-used choice, so that's what this tool applies. Zakat is 2.5% of total zakatable wealth once your net assets (assets minus due debts) meet or exceed the nisab threshold and a lunar year has passed on that wealth. This is a general calculation; for your specific situation it's best to confirm with a knowledgeable scholar.</p>
+</section>
+
+<script>
+function calc() {
+  const gold = parseFloat(document.getElementById('gold').value) || 0;
+  const goldRate = parseFloat(document.getElementById('goldRate').value) || 0;
+  const silver = parseFloat(document.getElementById('silver').value) || 0;
+  const silverRate = parseFloat(document.getElementById('silverRate').value) || 0;
+  const cash = parseFloat(document.getElementById('cash').value) || 0;
+  const invest = parseFloat(document.getElementById('invest').value) || 0;
+  const debt = parseFloat(document.getElementById('debt').value) || 0;
+
+  const goldValue = gold * goldRate;
+  const silverValue = silver * silverRate;
+  const totalAssets = goldValue + silverValue + cash + invest;
+  const netAssets = totalAssets - debt;
+  const nisab = 612.36 * silverRate;
+
+  const out = document.getElementById('out');
+  out.style.display = 'block';
+
+  if (silverRate <= 0) {
+    out.textContent = 'Enter the current silver price per gram to calculate nisab.';
+    return;
+  }
+  if (netAssets < nisab) {
+    out.textContent = 'Net assets: ' + netAssets.toLocaleString() + '. This is below the nisab threshold (' + nisab.toLocaleString() + '), so Zakat is not obligatory this year.';
+  } else {
+    const zakatDue = netAssets * 0.025;
+    out.textContent = 'Net zakatable assets: ' + netAssets.toLocaleString() + '. Nisab: ' + nisab.toLocaleString() + '. Zakat due (2.5%): ' + zakatDue.toLocaleString(undefined, {maximumFractionDigits: 2});
+  }
+}
+</script>
+
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="../tools/word-counter.html">Word Counter</a></li><li><a href="../tools/case-converter.html">Case Converter</a></li><li><a href="../tools/password-generator.html">Password Generator</a></li><li><a href="../tools/qr-code-generator.html">QR Code</a></li><li><a href="../tools/bmi-calculator.html">BMI Calculator</a></li><li><a href="../tools/age-calculator.html">Age Calculator</a></li><li><a href="../tools/percentage-calculator.html">Percentage</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More tools</h4>
+        <ul>
+          <li><a href="../tools/unit-converter.html">Unit Converter</a></li><li><a href="../tools/color-converter.html">Color Converter</a></li><li><a href="../tools/json-formatter.html">JSON Formatter</a></li><li><a href="../tools/base64.html">Base64</a></li><li><a href="../tools/zakat-calculator.html">Zakat Calculator</a></li><li><a href="../tools/loan-calculator.html">Loan / EMI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="../about.html">About</a></li>
+          <li><a href="../contact.html">Contact</a></li>
+          <li><a href="../privacy-policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="foot-note">ToolKrate &mdash; free browser-based tools. All processing happens on your device; nothing you type or upload is sent to a server.</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</body>
+</html>
