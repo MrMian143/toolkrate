@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Images to PDF Converter — Combine Photos into One PDF | ToolKrate</title>
-<meta name="description" content="Combine multiple JPG or PNG images into a single downloadable PDF, entirely in your browser.">
+<title>PDF Compressor — Reduce PDF File Size Online | ToolKrate</title>
+<meta name="description" content="Shrink a PDF's file size by recompressing its pages, entirely in your browser. Best for scanned or image-heavy PDFs.">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -30,12 +30,12 @@
       <a href="../tools/image-compressor.html">Image Compressor</a>
       <a href="../tools/image-resizer.html">Image Resizer</a>
       <a href="../tools/image-converter.html">Image Converter</a>
-      <a href="../tools/images-to-pdf.html" aria-current="page">Images to PDF</a>
+      <a href="../tools/images-to-pdf.html">Images to PDF</a>
       <a href="../tools/merge-pdf.html">Merge PDF</a>
       <a href="../tools/word-to-pdf.html">Word to PDF</a>
       <a href="../tools/zip-files.html">Zip Files</a>
       <a href="../tools/video-compressor.html">Video Compressor</a>
-      <a href="../tools/pdf-compressor.html">PDF Compressor</a>
+      <a href="../tools/pdf-compressor.html" aria-current="page">PDF Compressor</a>
       <a href="../about.html">About</a>
       <a href="../contact.html">Contact</a>
       <a href="../privacy-policy.html">Privacy</a>
@@ -45,63 +45,115 @@
 
 
 <section class="wrap">
-  <p class="crumb"><a href="../index.html">Home</a> / Images to PDF</p>
+  <p class="crumb"><a href="../index.html">Home</a> / PDF Compressor</p>
 </section>
 <section class="page-head wrap">
-  <h1>Images to PDF</h1>
-  <p>Combine one or more JPG/PNG images into a single PDF file, in the order you select them.</p>
+  <h1>PDF Compressor</h1>
+  <p>Reduce a PDF's file size, right in your browser. Best suited to scanned documents or PDFs full of photos.</p>
 </section>
 
 <section class="wrap">
   <div class="workspace">
     <div class="field">
-      <label for="file">Choose images (select multiple)</label>
-      <input type="file" id="file" accept="image/png, image/jpeg" multiple>
-      <p class="hint">Hold Ctrl (Windows) or Cmd (Mac) to select several images at once. They'll appear in the PDF in the order shown below.</p>
+      <label for="file">Choose a PDF</label>
+      <input type="file" id="file" accept="application/pdf">
     </div>
-    <div class="file-list" id="fileList"></div>
-    <button onclick="process()" style="margin-top:16px;">Create PDF</button>
+    <div class="field">
+      <label for="quality">Compression level</label>
+      <select id="quality">
+        <option value="0.9|1.5">Light (best quality, less size saved)</option>
+        <option value="0.7|1.2" selected>Balanced</option>
+        <option value="0.5|0.9">Strong (smallest file, lower quality)</option>
+      </select>
+    </div>
+    <button id="runBtn" onclick="process()">Compress PDF</button>
+
+    <div class="notice">This works by redrawing each page as a compressed image and rebuilding the PDF from those images &mdash; the same approach most "compress PDF" tools use. It shrinks scanned pages and image-heavy PDFs very well. The trade-off: text in the compressed PDF is no longer selectable or searchable, since each page becomes a picture of itself. If you need to keep selectable text, this isn't the right tool for that file &mdash; only use it when a smaller file matters more than searchable text.</div>
+
+    <div id="log" class="output" style="display:none; font-size:0.82rem;"></div>
     <div class="progress-wrap" id="progressWrap" style="display:none;"><div class="progress-bar" id="progressBar"></div></div>
+
     <div id="result" style="display:none; margin-top:16px;">
-      <a class="btn" id="downloadBtn" download="images.pdf">Download PDF</a>
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="originalSize">0 MB</div><div class="l">Original size</div></div>
+        <div class="stat"><div class="n" id="newSize">0 MB</div><div class="l">Compressed size</div></div>
+        <div class="stat"><div class="n" id="saved">0%</div><div class="l">Reduction</div></div>
+      </div>
+      <div style="margin-top:12px;">
+        <a class="btn" id="downloadBtn" download="compressed.pdf">Download compressed PDF</a>
+      </div>
     </div>
   </div>
 </section>
 
 <div class="wrap"><div class="ad-slot">Ad space</div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script>
-const fileInput = document.getElementById('file');
-fileInput.addEventListener('change', function () {
-  const list = Array.from(fileInput.files).map(f => f.name).join(', ');
-  document.getElementById('fileList').textContent = fileInput.files.length ? fileInput.files.length + ' file(s): ' + list : '';
-});
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function fmtBytes(n) {
+  if (n < 1024*1024) return (n/1024).toFixed(0) + ' KB';
+  return (n/1024/1024).toFixed(2) + ' MB';
+}
 
 async function process() {
-  const files = Array.from(fileInput.files);
-  if (!files.length) { alert('Choose at least one image.'); return; }
+  const fileInput = document.getElementById('file');
+  const file = fileInput.files[0];
+  if (!file) { alert('Choose a PDF first.'); return; }
+
+  const [jpegQuality, scale] = document.getElementById('quality').value.split('|').map(Number);
+  const runBtn = document.getElementById('runBtn');
+  const log = document.getElementById('log');
   const progressWrap = document.getElementById('progressWrap');
   const progressBar = document.getElementById('progressBar');
+  runBtn.disabled = true;
+  log.style.display = 'block';
   progressWrap.style.display = 'block';
   progressBar.style.width = '0%';
+  log.textContent = 'Reading PDF...';
 
-  const pdfDoc = await PDFLib.PDFDocument.create();
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const bytes = await file.arrayBuffer();
-    let img;
-    if (file.type === 'image/png') img = await pdfDoc.embedPng(bytes);
-    else img = await pdfDoc.embedJpg(bytes);
-    const page = pdfDoc.addPage([img.width, img.height]);
-    page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
-    progressBar.style.width = Math.round(((i + 1) / files.length) * 100) + '%';
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+    const outDoc = await PDFLib.PDFDocument.create();
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      log.textContent = 'Processing page ' + i + ' of ' + pdf.numPages + '...';
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      const jpegDataUrl = canvas.toDataURL('image/jpeg', jpegQuality);
+      const jpegBytes = await (await fetch(jpegDataUrl)).arrayBuffer();
+      const embeddedImg = await outDoc.embedJpg(jpegBytes);
+      const outPage = outDoc.addPage([viewport.width, viewport.height]);
+      outPage.drawImage(embeddedImg, { x: 0, y: 0, width: viewport.width, height: viewport.height });
+
+      progressBar.style.width = Math.round((i / pdf.numPages) * 100) + '%';
+    }
+
+    const outBytes = await outDoc.save();
+    const blob = new Blob([outBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+
+    document.getElementById('downloadBtn').href = url;
+    document.getElementById('originalSize').textContent = fmtBytes(file.size);
+    document.getElementById('newSize').textContent = fmtBytes(blob.size);
+    const savedPct = Math.round((1 - blob.size / file.size) * 100);
+    document.getElementById('saved').textContent = (savedPct > 0 ? savedPct : 0) + '%';
+    document.getElementById('result').style.display = 'block';
+    log.textContent = 'Done.';
+  } catch (err) {
+    log.textContent = 'Something went wrong: ' + err.message;
+  } finally {
+    runBtn.disabled = false;
   }
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-  const url = URL.createObjectURL(blob);
-  document.getElementById('downloadBtn').href = url;
-  document.getElementById('result').style.display = 'block';
 }
 </script>
 
