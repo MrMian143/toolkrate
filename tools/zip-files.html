@@ -36,6 +36,7 @@
       <a href="../tools/zip-files.html" aria-current="page">Zip Files</a>
       <a href="../tools/video-compressor.html">Video Compressor</a>
       <a href="../tools/pdf-compressor.html">PDF Compressor</a>
+      <a href="../tools/file-compressor.html">File Compressor</a>
       <a href="../about.html">About</a>
       <a href="../contact.html">Contact</a>
       <a href="../privacy-policy.html">Privacy</a>
@@ -95,7 +96,9 @@ async function process() {
     progressBar.style.width = (40 + Math.round(metadata.percent * 0.6)) + '%';
   });
   const url = URL.createObjectURL(blob);
-  document.getElementById('downloadBtn').href = url;
+  const dlBtn = document.getElementById('downloadBtn');
+  dlBtn.href = url;
+  dlBtn.download = files.length === 1 ? (files[0].name + '.zip') : 'archive.zip';
   document.getElementById('result').style.display = 'block';
 }
 </script>

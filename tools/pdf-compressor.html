@@ -36,6 +36,7 @@
       <a href="../tools/zip-files.html">Zip Files</a>
       <a href="../tools/video-compressor.html">Video Compressor</a>
       <a href="../tools/pdf-compressor.html" aria-current="page">PDF Compressor</a>
+      <a href="../tools/file-compressor.html">File Compressor</a>
       <a href="../about.html">About</a>
       <a href="../contact.html">Contact</a>
       <a href="../privacy-policy.html">Privacy</a>
@@ -143,6 +144,7 @@ async function process() {
     const url = URL.createObjectURL(blob);
 
     document.getElementById('downloadBtn').href = url;
+    document.getElementById('downloadBtn').download = file.name;
     document.getElementById('originalSize').textContent = fmtBytes(file.size);
     document.getElementById('newSize').textContent = fmtBytes(blob.size);
     const savedPct = Math.round((1 - blob.size / file.size) * 100);

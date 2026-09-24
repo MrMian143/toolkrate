@@ -36,6 +36,7 @@
       <a href="../tools/zip-files.html">Zip Files</a>
       <a href="../tools/video-compressor.html">Video Compressor</a>
       <a href="../tools/pdf-compressor.html">PDF Compressor</a>
+      <a href="../tools/file-compressor.html">File Compressor</a>
       <a href="../about.html">About</a>
       <a href="../contact.html">Contact</a>
       <a href="../privacy-policy.html">Privacy</a>
@@ -128,12 +129,14 @@ function process() {
       canvas.toBlob(function (blob) {
         const url = URL.createObjectURL(blob);
         document.getElementById('preview').src = url;
-        document.getElementById('downloadBtn').href = url;
         document.getElementById('originalSize').textContent = fmtBytes(file.size);
         document.getElementById('newSize').textContent = fmtBytes(blob.size);
         const saved = Math.max(0, Math.round((1 - blob.size / file.size) * 100));
         document.getElementById('saved').textContent = saved + '%';
         document.getElementById('result').style.display = 'block';
+        const dlBtn = document.getElementById('downloadBtn');
+        dlBtn.href = url;
+        dlBtn.download = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
       }, 'image/jpeg', quality);
     };
     img.src = e.target.result;
