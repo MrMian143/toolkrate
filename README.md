@@ -47,3 +47,14 @@ All libraries are free, open-source and widely used — no fees, no accounts, no
 ## Notes
 - Colors, glow and every visual style live in `style.css` under `:root`.
 - Tools needing a CDN library and the QR generator need an internet connection. Every other tool works fully offline once the page has loaded.
+
+## Logo & favicon
+
+The site now uses the "crate" icon (an open box, referencing the name) as its logo:
+- Site header everywhere now shows this icon instead of the old diamond mark.
+- `favicon.svg`, `favicon.ico`, `favicon-16.png`, `favicon-32.png`, `favicon-180.png` are in the repo root and linked from every page's `<head>` — this is what shows in the browser tab.
+- `brand-assets/` folder has standalone copies for anything else you need:
+  - `logo-icon.svg` — the icon alone, transparent background, scalable (best for most uses)
+  - `logo-icon-transparent.png` — same icon, 512×512 PNG with transparent background
+  - `logo-icon-square-black.png` — icon on a black rounded square, 512×512 (app-icon style, e.g. for social profile pictures)
+  - `logo-horizontal.png` — full lockup (icon + "ToolKrate" wordmark + "free tools" tag), 1200×300, for banners or link previews
